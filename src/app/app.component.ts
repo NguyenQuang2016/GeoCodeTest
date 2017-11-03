@@ -45,38 +45,44 @@ export class AppComponent implements OnInit {
   geocode_click() {
     let address = (<HTMLInputElement>document.getElementById('addr')).value + ', Quan 7, Ho Chi Minh';
     address = address.replace(/ /g, '+');
-    const xhr = new XMLHttpRequest();
-    xhr.onload = () => {
-      this.geocodeCallback(xhr.response, address);
+
+    const textSearchReq: google.maps.places.TextSearchRequest = {
+      query: address,
     };
-    xhr.onerror = function() {
-      console.log('Woops, there was an error making the request.');
-    };
-    const url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' +
-                  address + '&key=AIzaSyCkasIhnDT8JXp8mVMVO7c2AXYfZpUF7dU';
-    xhr.open('GET', url, true);
-    xhr.send();
+    const service = new google.maps.places.PlacesService(this.mapInstance);
+    service.textSearch(textSearchReq, (results, status) => {
+      this.geocodeCallback(results, address);
+    });
+
   }
-  geocodeCallback(response: any, address: string) {
-    let resp = JSON.parse(response);
-    if (resp.results.length !== 0) {
-      console.log(resp);
+  geocodeCallback(results: google.maps.places.PlaceResult[], address: string) {
+    if (results.length !== 0) {
+      console.log(results);
+
+      const markerLatLng: google.maps.LatLngLiteral = {
+        lat: results[0].geometry.location.lat(),
+        lng: results[0].geometry.location.lng(),
+      };
+      const markersOpt: google.maps.MarkerOptions = {
+        draggable: false,
+        position: markerLatLng,
+        animation: google.maps.Animation.BOUNCE,
+      };
+      const place_marker = new google.maps.Marker( markersOpt);
+      place_marker.setMap(this.mapInstance);
+      this.mapInstance.setCenter(markerLatLng);
+      this.mapInstance.setZoom(15);
     } else {
       const wp = address.indexOf('+');
       address = address.slice(wp + 1, address.length);
 
-      const xhr = new XMLHttpRequest();
-      xhr.onload = () => {
-        const len = xhr.response.lenght;
-        this.geocodeCallback(xhr.response, address);
+      const textSearchReq: google.maps.places.TextSearchRequest = {
+        query: address,
       };
-      xhr.onerror = function() {
-        console.log('Woops, there was an error making the request.');
-      };
-      const url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' +
-                address + '&key=AIzaSyCkasIhnDT8JXp8mVMVO7c2AXYfZpUF7dU';
-      xhr.open('GET', url, true);
-      xhr.send();
+      const service = new google.maps.places.PlacesService(this.mapInstance);
+      service.textSearch(textSearchReq, (_results, status) => {
+        this.geocodeCallback(_results, address);
+      });
     }
   }
 }
