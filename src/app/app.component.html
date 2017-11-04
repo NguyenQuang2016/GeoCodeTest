@@ -1,9 +1,17 @@
 <br>
 <br>
 <div>
-  Last name: 
-  <input id = "addr" type="text" name="lastname"  size="200">  
+  City: <input [value] = "cityField" id = "txt_city" type="text" name="lastname"  size="40" (input) = "onCityChange($event)">
+  District: <input [value] = "districtField" id = "txt_dicstict" type="text" name="lastname"  size="30" (input) = "onDistrictChange($event)">  
+  Ward: <input [value] = "wardField" id = "txt_ward" type="text" name="lastname"  size="30" (input) = "onWardChange($event)">  
+  <br><br>
+  Address: <input [value] = "address" id = "txt_address" type="text" name="lastname"  size="100" (input) = "onAddressChange($event)">  
   <input type="submit" (click)="geocode_click()">
 </div>
 <br>
+<div id = "latlng"></div>
+<div id = "bindingDist">{{cityField}}</div>
+<div id = "bindingDist">{{districtField}}</div>
+<div id = "bindingWard">{{wardField}}</div>
+<div id = "bindingAddress">{{address}}</div>
 <div id = "ggmap"></div>
